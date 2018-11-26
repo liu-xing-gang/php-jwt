@@ -13,7 +13,6 @@ class Jwt {
     //使用HMAC生成信息摘要时所使用的密钥
     private static $key='123456';
 
-
     /**
      * 获取jwt token
      * @param array $payload jwt载荷   格式如下非必须
@@ -37,9 +36,9 @@ class Jwt {
             return $token;
         }else{
             return false;
+
         }
     }
-
 
     /**
      * 验证token是否有效,默认验证exp,nbf,iat时间
@@ -69,7 +68,7 @@ class Jwt {
         if (isset($payload['iat']) && $payload['iat'] > time())
             return false;
 
-        //过期时间小宇当前服务器时间验证失败
+        //过期时间小于当前服务器时间验证失败
         if (isset($payload['exp']) && $payload['exp'] < time())
             return false;
 
@@ -79,9 +78,6 @@ class Jwt {
 
         return $payload;
     }
-
-
-
 
     /**
      * base64UrlEncode   https://jwt.io/  中base64UrlEncode编码实现
@@ -124,30 +120,31 @@ class Jwt {
     }
 }
 
-    //测试和官网是否匹配begin
-    $payload=array('sub'=>'1234567890','name'=>'John Doe','iat'=>1516239022);
-    $jwt=new Jwt;
-    $token=$jwt->getToken($payload);
-    echo "<pre>";
-    echo $token;
+//测试和官网是否匹配begin
+$payload=array('sub'=>'1234567890','name'=>'John Doe','iat'=>1516239022);
+$jwt=new Jwt;
+$token=$jwt->getToken($payload);
+echo "<pre>";
+echo $token;
+
+//对token进行验证签名
+$getPayload=$jwt->verifyToken($token);
+echo "<br><br>";
+var_dump($getPayload);
+echo "<br><br>";
+//测试和官网是否匹配end
+
+//自己使用测试begin
+$payload_test=array('iss'=>'admin','iat'=>time(),'exp'=>time()+7200,'nbf'=>time(),'sub'=>'www.admin.com','jti'=>md5(uniqid('JWT').time()));;
+$token_test=Jwt::getToken($payload_test);
+echo "<pre>";
+echo $token_test;
+
+//对token进行验证签名
+$getPayload_test=Jwt::verifyToken($token_test);
+echo "<br><br>";
+var_dump($getPayload_test);
+echo "<br><br>";
+//自己使用时候end
     
-    //对token进行验证签名
-    $getPayload=$jwt->verifyToken($token);
-    echo "<br><br>";
-    var_dump($getPayload);
-    echo "<br><br>";
-    //测试和官网是否匹配end
     
-    
-    //自己使用测试begin
-    $payload_test=array('iss'=>'admin','iat'=>time(),'exp'=>time()+7200,'nbf'=>time(),'sub'=>'www.admin.com','jti'=>md5(uniqid('JWT').time()));;
-    $token_test=Jwt::getToken($payload_test);
-    echo "<pre>";
-    echo $token_test;
-    
-    //对token进行验证签名
-    $getPayload_test=Jwt::verifyToken($token_test);
-    echo "<br><br>";
-    var_dump($getPayload_test);
-    echo "<br><br>";
-    //自己使用时候end
